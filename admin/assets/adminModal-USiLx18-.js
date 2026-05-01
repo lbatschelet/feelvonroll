@@ -1,0 +1,1 @@
+function t(i){i.classList.add("is-visible")}function d(i){i.classList.remove("is-visible")}function c(i,e,a=[]){i.addEventListener("click",s=>{s.target===i&&e()}),a.forEach(s=>{s&&s.addEventListener("click",e)})}export{c as b,d as h,t as s};

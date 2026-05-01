@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" style="background:#f3f4f6">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#f3f4f6" />
+    <script>
+      // iOS home-screen installs can ignore deep links when a manifest with
+      // start_url is present. For station-specific shortcuts we keep the exact
+      // URL by not attaching the manifest on iOS.
+      (function attachManifestForNonIOS() {
+        const ua = navigator.userAgent || ''
+        const platform = navigator.platform || ''
+        const isIOS =
+          /iPad|iPhone|iPod/.test(ua) ||
+          (platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        if (isIOS) return
+        const link = document.createElement('link')
+        link.rel = 'manifest'
+        link.href = '/manifest.json'
+        document.head.appendChild(link)
+      })()
+    </script>
+    <script>
+      // Load Plausible everywhere except localhost to avoid polluting analytics during local dev.
+      // Use first-party paths (/js/script.js, /api/event) so fewer adblockers block it.
+      (function loadPlausible() {
+        const host = (window.location && window.location.hostname) || ''
+        const isLocalhost =
+          host === 'localhost' ||
+          host === '127.0.0.1' ||
+          host === '0.0.0.0' ||
+          host.endsWith('.local')
+        if (isLocalhost) return
+
+        const s = document.createElement('script')
+        s.defer = true
+        s.setAttribute('data-domain', 'feelvonroll.ch')
+        s.setAttribute('data-api', '/api/event')
+        s.src = '/js/script.js'
+        document.head.appendChild(s)
+      })()
+    </script>
+    <title>feelvonRoll</title>
+    <script type="module" crossorigin src="/assets/main-yvcuDIaw.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-hw6EA_oB.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>
