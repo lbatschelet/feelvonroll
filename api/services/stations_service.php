@@ -11,6 +11,47 @@ require_once __DIR__ . '/../lib/errors.php';
 require_once __DIR__ . '/../lib/audit.php';
 
 /**
+ * Normalizes a station key to a URL-safe slug.
+ *
+ * Rules:
+ * - lowercase
+ * - replace spaces/underscores with hyphens
+ * - transliterate common German umlauts (ä/ö/ü/ß)
+ * - strip everything except [a-z0-9-]
+ * - collapse repeated hyphens and trim hyphens
+ */
+function normalize_station_key(string $raw): string
+{
+    $key = trim($raw);
+    if ($key === '') return '';
+    $key = mb_strtolower($key, 'UTF-8');
+    $key = str_replace(['ä', 'ö', 'ü', 'ß'], ['ae', 'oe', 'ue', 'ss'], $key);
+    $key = preg_replace('/[\s_]+/u', '-', $key) ?? $key;
+    $key = preg_replace('/[^a-z0-9-]+/u', '', $key) ?? $key;
+    $key = preg_replace('/-+/u', '-', $key) ?? $key;
+    $key = trim($key, '-');
+    return $key;
+}
+
+function assert_valid_station_key(string $key, string $original): void
+{
+    if ($key === '') {
+        throw new ApiError('Station key and name are required', 400);
+    }
+    // Strict: slug segments separated by single hyphens.
+    if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $key)) {
+        throw new ApiError(
+            'Invalid station key. Allowed: lowercase letters a-z, numbers 0-9, hyphen (-).',
+            400
+        );
+    }
+    // Help the user understand what changed.
+    if ($original !== '' && $key !== $original) {
+        throw new ApiError("Invalid station key. Suggested: $key", 400);
+    }
+}
+
+/**
  * Lists all stations with their assigned questionnaire name.
  *
  * @param PDO $pdo
@@ -38,12 +79,14 @@ function admin_stations_list(PDO $pdo): array
  */
 function admin_stations_upsert(PDO $pdo, ?int $adminUserId, array $data): array
 {
-    $key = trim($data['station_key'] ?? '');
+    $keyRaw = trim($data['station_key'] ?? '');
+    $key = normalize_station_key($keyRaw);
     $name = trim($data['name'] ?? '');
 
     if (!$key || !$name) {
         throw new ApiError('Station key and name are required', 400);
     }
+    assert_valid_station_key($key, $keyRaw);
 
     $id = isset($data['id']) ? intval($data['id']) : null;
     $description = $data['description'] ?? null;
@@ -104,6 +147,11 @@ function admin_stations_delete(PDO $pdo, ?int $adminUserId, int $id): array
  */
 function public_station_get(PDO $pdo, string $stationKey): array
 {
+    // Keep public URLs robust but safe.
+    $stationKey = normalize_station_key($stationKey);
+    if (!$stationKey) {
+        throw new ApiError('Station not found', 404);
+    }
     $stmt = $pdo->prepare(
         'SELECT s.*, q.questionnaire_key
          FROM stations s
