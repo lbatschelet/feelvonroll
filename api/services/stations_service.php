@@ -41,13 +41,16 @@ function assert_valid_station_key(string $key, string $original): void
     // Strict: slug segments separated by single hyphens.
     if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $key)) {
         throw new ApiError(
-            'Invalid station key. Allowed: lowercase letters a-z, numbers 0-9, hyphen (-).',
+            'Invalid station key. Allowed: lowercase letters a-z, digits 0-9, hyphens (-). This is the stable URL slug embedded in QR paths; use Name for a readable label.',
             400
         );
     }
     // Help the user understand what changed.
     if ($original !== '' && $key !== $original) {
-        throw new ApiError("Invalid station key. Suggested: $key", 400);
+        throw new ApiError(
+            "Invalid station key. Expected \"{$key}\" (stable URL slug / QR path). Received \"{$original}\". Use Name for a human-readable label.",
+            400
+        );
     }
 }
 
@@ -147,26 +150,51 @@ function admin_stations_delete(PDO $pdo, ?int $adminUserId, int $id): array
  */
 function public_station_get(PDO $pdo, string $stationKey): array
 {
-    // Keep public URLs robust but safe.
-    $stationKey = normalize_station_key($stationKey);
-    if (!$stationKey) {
+    $rawKey = trim($stationKey);
+    if ($rawKey === '') {
         throw new ApiError('Station not found', 404);
     }
-    $stmt = $pdo->prepare(
-        'SELECT s.*, q.questionnaire_key
-         FROM stations s
-         LEFT JOIN questionnaires q ON q.id = s.questionnaire_id
-         WHERE s.station_key = :key
-         LIMIT 1'
-    );
-    $stmt->execute(['key' => $stationKey]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $normalizedInput = normalize_station_key($rawKey);
+
+    $lookup = function (string $k) use ($pdo): array|false {
+        $stmt = $pdo->prepare(
+            'SELECT s.*, q.questionnaire_key
+             FROM stations s
+             LEFT JOIN questionnaires q ON q.id = s.questionnaire_id
+             WHERE s.station_key = :key
+             LIMIT 1'
+        );
+        $stmt->execute(['key' => $k]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    };
+
+    // Backward compatibility:
+    // - Old QR codes may use legacy station_key values (spaces, umlauts, underscores, casing).
+    // - New links should use the normalized slug.
+    $row = $lookup($rawKey);
+    if (!$row && $normalizedInput !== '') {
+        $row = $lookup($normalizedInput);
+    }
+    if (!$row && $normalizedInput !== '') {
+        // Last resort: match normalized input against normalized stored keys.
+        // Stations list is small in practice; avoids breaking legacy DB keys without editing physical QR codes.
+        $keysStmt = $pdo->query('SELECT station_key FROM stations');
+        $keys = $keysStmt ? $keysStmt->fetchAll(PDO::FETCH_COLUMN) : [];
+        foreach ($keys as $storedKey) {
+            if (!is_string($storedKey) || $storedKey === '') continue;
+            if (normalize_station_key($storedKey) === $normalizedInput) {
+                $row = $lookup($storedKey);
+                if ($row) break;
+            }
+        }
+    }
 
     if (!$row) {
-        throw new ApiError("Station not found: $stationKey", 404);
+        throw new ApiError("Station not found: $rawKey", 404);
     }
     if (!intval($row['is_active'])) {
-        throw new ApiError("Station is inactive: $stationKey", 404);
+        throw new ApiError("Station is inactive: $rawKey", 404);
     }
 
     return [
