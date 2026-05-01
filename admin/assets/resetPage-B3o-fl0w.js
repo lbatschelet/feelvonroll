@@ -1,7 +1,7 @@
-import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-dcVj4wuk.js";function d(){const e=document.createElement("div");e.className="layout";const s=r?.wordmarkHtml;return e.innerHTML=`
+import{e as a}from"./dom-DU-lIz3W.js";import{b as o}from"./config-dcVj4wuk.js";function l(){const e=document.createElement("div");e.className="layout";const r=o?.wordmarkHtml,s="/admin/",t=s.endsWith("/")?s:`${s}/`;return e.innerHTML=`
     <header class="header">
       <div class="header-brand">
-        <a class="header-title" href="/" title="Back to login">${s} Admin</a>
+        <a class="header-title" href="${t}" title="Back to login">${r} Admin</a>
       </div>
     </header>
     <section class="card login-card">
@@ -16,7 +16,7 @@ import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-dcVj4wuk.js";f
           <button id="resetRequestButton">Send reset link</button>
         </div>
         <div id="resetRequestStatus" class="status"></div>
-        <p class="form-hint" style="margin-top: 12px;"><a href="/">Back to login</a></p>
+        <p class="form-hint" style="margin-top: 12px;"><a href="${t}">Back to login</a></p>
       </div>
       <div class="reset-section" data-section="set-password" style="display:none;">
         <h2>Set new password</h2>
@@ -34,7 +34,7 @@ import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-dcVj4wuk.js";f
           <button id="resetSetPasswordButton">Set password</button>
         </div>
         <div id="resetSetStatus" class="status"></div>
-        <p class="form-hint" style="margin-top: 12px;"><a href="/">Back to login</a></p>
+        <p class="form-hint" style="margin-top: 12px;"><a href="${t}">Back to login</a></p>
       </div>
     </section>
-  `,t(e),{element:e,requestSection:e.querySelector('[data-section="request"]'),requestEmail:e.querySelector("#resetRequestEmail"),requestButton:e.querySelector("#resetRequestButton"),requestStatus:e.querySelector("#resetRequestStatus"),setPasswordSection:e.querySelector('[data-section="set-password"]'),emailHint:e.querySelector("#resetEmailHint"),newPassword:e.querySelector("#resetNewPassword"),confirmPassword:e.querySelector("#resetConfirmPassword"),passwordMatch:e.querySelector("#resetPasswordMatch"),setPasswordButton:e.querySelector("#resetSetPasswordButton"),setStatus:e.querySelector("#resetSetStatus")}}export{d as createResetPage};
+  `,a(e),{element:e,requestSection:e.querySelector('[data-section="request"]'),requestEmail:e.querySelector("#resetRequestEmail"),requestButton:e.querySelector("#resetRequestButton"),requestStatus:e.querySelector("#resetRequestStatus"),setPasswordSection:e.querySelector('[data-section="set-password"]'),emailHint:e.querySelector("#resetEmailHint"),newPassword:e.querySelector("#resetNewPassword"),confirmPassword:e.querySelector("#resetConfirmPassword"),passwordMatch:e.querySelector("#resetPasswordMatch"),setPasswordButton:e.querySelector("#resetSetPasswordButton"),setStatus:e.querySelector("#resetSetStatus")}}export{l as createResetPage};
