@@ -157,6 +157,18 @@ final class StationsServiceTest extends TestCase
         ]);
     }
 
+    public function testCreateStationRejectsNonUrlSafeKey(): void
+    {
+        $this->expectException(ApiError::class);
+        admin_stations_upsert($this->pdo, null, [
+            'station_key' => 'Café EG 01',
+            'name' => 'Cafe',
+            'floor_index' => 0,
+            'camera_x' => 0, 'camera_y' => 0, 'camera_z' => 0,
+            'target_x' => 0, 'target_y' => 0, 'target_z' => 0,
+        ]);
+    }
+
     public function testCreateStationWithQuestionnaire(): void
     {
         $qId = $this->pdo->query("SELECT id FROM questionnaires WHERE questionnaire_key = 'station_q'")->fetchColumn();
