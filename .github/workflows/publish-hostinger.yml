@@ -3,6 +3,11 @@ name: Publish to deploy branch (Hostinger Git)
 on:
   workflow_dispatch:
     inputs:
+      source_ref:
+        description: "Git ref to build from (branch, tag, or SHA)"
+        type: string
+        required: true
+        default: chore/monorepo
       brand:
         description: "Brand to publish"
         type: choice
@@ -46,6 +51,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
 
       - uses: pnpm/action-setup@v4
         with:
