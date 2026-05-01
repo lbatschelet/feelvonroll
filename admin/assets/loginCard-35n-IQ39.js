@@ -1,4 +1,4 @@
-import{e as t}from"./dom-DU-lIz3W.js";function a(){const o=document.createElement("section");return o.className="card login-card",o.innerHTML=`
+import{e as a}from"./dom-DU-lIz3W.js";function i(){const t="/admin/",e=t.endsWith("/")?t:`${t}/`,o=document.createElement("section");return o.className="card login-card",o.innerHTML=`
     <h2>Login</h2>
     <div class="auth-section" data-section="login">
       <div class="form-row">
@@ -11,7 +11,7 @@ import{e as t}from"./dom-DU-lIz3W.js";function a(){const o=document.createElemen
       </div>
       <div class="form-actions">
         <button id="loginUserButton">Log in</button>
-        <a href="/reset" class="forgot-link">Forgot password?</a>
+        <a href="${e}reset" class="forgot-link">Forgot password?</a>
       </div>
     </div>
     <div class="auth-section" data-section="bootstrap">
@@ -23,4 +23,4 @@ import{e as t}from"./dom-DU-lIz3W.js";function a(){const o=document.createElemen
         <button id="bootstrapButton">Start setup</button>
       </div>
     </div>
-  `,t(o),{element:o,loginEmail:o.querySelector("#loginEmail"),loginPassword:o.querySelector("#loginPassword"),loginUserButton:o.querySelector("#loginUserButton"),tokenInput:o.querySelector("#adminToken"),bootstrapButton:o.querySelector("#bootstrapButton")}}export{a as createLoginCard};
+  `,a(o),{element:o,loginEmail:o.querySelector("#loginEmail"),loginPassword:o.querySelector("#loginPassword"),loginUserButton:o.querySelector("#loginUserButton"),tokenInput:o.querySelector("#adminToken"),bootstrapButton:o.querySelector("#bootstrapButton")}}export{i as createLoginCard};
