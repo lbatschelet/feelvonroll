@@ -5,7 +5,8 @@
  *          admin_auth_set_password, admin_auth_request_reset, admin_auth_refresh.
  */
 require_once __DIR__ . '/token_service.php';
-require_once __DIR__ . '/email_service.php';
+// email_service depends on composer vendor/autoload.php which may not be shipped
+// in lightweight deploys. Load it lazily only when needed (password reset).
 
 /**
  * Returns admin user count and bootstrap status.
@@ -191,6 +192,7 @@ function admin_auth_request_reset(PDO $pdo, array $config, string $email): array
         $result = generate_reset_token($pdo, intval($user['id']));
         $resetLink = rtrim($config['app_url'] ?? '', '/') . '/reset?token=' . $result['reset_token'];
         try {
+            require_once __DIR__ . '/email_service.php';
             send_reset_email($config, $email, $user['first_name'] ?? '', $resetLink, 24);
         } catch (\Throwable $e) {
             // Silently fail – never reveal whether email exists
