@@ -1,7 +1,7 @@
-import{e as s}from"./dom-DU-lIz3W.js";function r(){const e=document.createElement("div");return e.className="layout",e.innerHTML=`
+import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-BJ-Z3s_A.js";function d(){const e=document.createElement("div");e.className="layout";const s=r?.wordmarkHtml;return e.innerHTML=`
     <header class="header">
       <div class="header-brand">
-        <a class="header-title" href="/" title="Back to login"><em>feel</em><strong>vonRoll</strong> Admin</a>
+        <a class="header-title" href="/" title="Back to login">${s} Admin</a>
       </div>
     </header>
     <section class="card login-card">
@@ -37,4 +37,4 @@ import{e as s}from"./dom-DU-lIz3W.js";function r(){const e=document.createElemen
         <p class="form-hint" style="margin-top: 12px;"><a href="/">Back to login</a></p>
       </div>
     </section>
-  `,s(e),{element:e,requestSection:e.querySelector('[data-section="request"]'),requestEmail:e.querySelector("#resetRequestEmail"),requestButton:e.querySelector("#resetRequestButton"),requestStatus:e.querySelector("#resetRequestStatus"),setPasswordSection:e.querySelector('[data-section="set-password"]'),emailHint:e.querySelector("#resetEmailHint"),newPassword:e.querySelector("#resetNewPassword"),confirmPassword:e.querySelector("#resetConfirmPassword"),passwordMatch:e.querySelector("#resetPasswordMatch"),setPasswordButton:e.querySelector("#resetSetPasswordButton"),setStatus:e.querySelector("#resetSetStatus")}}export{r as createResetPage};
+  `,t(e),{element:e,requestSection:e.querySelector('[data-section="request"]'),requestEmail:e.querySelector("#resetRequestEmail"),requestButton:e.querySelector("#resetRequestButton"),requestStatus:e.querySelector("#resetRequestStatus"),setPasswordSection:e.querySelector('[data-section="set-password"]'),emailHint:e.querySelector("#resetEmailHint"),newPassword:e.querySelector("#resetNewPassword"),confirmPassword:e.querySelector("#resetConfirmPassword"),passwordMatch:e.querySelector("#resetPasswordMatch"),setPasswordButton:e.querySelector("#resetSetPasswordButton"),setStatus:e.querySelector("#resetSetStatus")}}export{d as createResetPage};
