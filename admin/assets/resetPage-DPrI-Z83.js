@@ -1,4 +1,4 @@
-import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-DvzYGSBB.js";function d(){const e=document.createElement("div");e.className="layout";const s=r?.wordmarkHtml;return e.innerHTML=`
+import{e as t}from"./dom-DU-lIz3W.js";import{b as r}from"./config-dcVj4wuk.js";function d(){const e=document.createElement("div");e.className="layout";const s=r?.wordmarkHtml;return e.innerHTML=`
     <header class="header">
       <div class="header-brand">
         <a class="header-title" href="/" title="Back to login">${s} Admin</a>

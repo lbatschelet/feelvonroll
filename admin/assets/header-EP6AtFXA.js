@@ -1,4 +1,4 @@
-import{b as e}from"./config-DvzYGSBB.js";function u(){const t=document.createElement("header");t.className="header";const n=e?.wordmarkHtml,a=e?.siteUrl;return t.innerHTML=`
+import{b as e}from"./config-dcVj4wuk.js";function u(){const t=document.createElement("header");t.className="header";const n=e?.wordmarkHtml,a=e?.siteUrl;return t.innerHTML=`
     <div class="header-brand">
       <a class="header-title" data-action="dashboard" href="#" title="Go to dashboard">${n} Admin</a>
       <a class="header-external" href="${a}" target="_blank" rel="noopener" title="Open ${a}">

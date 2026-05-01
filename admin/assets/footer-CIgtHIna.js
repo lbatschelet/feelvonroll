@@ -1,4 +1,4 @@
-import{b as r}from"./config-DvzYGSBB.js";const a=r?.siteUrl+"/issue/?source=admin";function n(){const e=document.createElement("footer");e.className="app-footer";const t=new Date().getFullYear();return e.innerHTML=`
+import{b as r}from"./config-dcVj4wuk.js";const a=r?.siteUrl+"/issue/?source=admin";function n(){const e=document.createElement("footer");e.className="app-footer";const t=new Date().getFullYear();return e.innerHTML=`
     <div class="footer-left">
       <span class="footer-credit">
         © ${t}
