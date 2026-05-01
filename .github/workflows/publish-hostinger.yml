@@ -1,0 +1,123 @@
+name: Publish to deploy branch (Hostinger Git)
+
+on:
+  workflow_dispatch:
+    inputs:
+      brand:
+        description: "Brand to publish"
+        type: choice
+        required: true
+        default: wohlopti
+        options:
+          - wohlopti
+          - feelvonroll
+      app:
+        description: "App to publish (viewer | admin | all)"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - viewer
+          - admin
+      deploy_branch:
+        description: "Target branch (must be configured in Hostinger Git integration)"
+        type: string
+        required: true
+        default: deploy/hostinger
+      include_api:
+        description: "Include PHP API under /api"
+        type: boolean
+        required: true
+        default: true
+      include_api_vendor:
+        description: "Run composer install and include /api/vendor"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish (${{ inputs.brand }} / ${{ inputs.app }}) → ${{ inputs.deploy_branch }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        env:
+          BRAND: ${{ inputs.brand }}
+          APP: ${{ inputs.app }}
+        run: pnpm run build
+
+      - name: Prepare deploy folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf deploy-root
+          mkdir -p deploy-root
+
+          if [[ "${{ inputs.app }}" == "all" ]]; then
+            cp -R dist/* deploy-root/
+          elif [[ "${{ inputs.app }}" == "viewer" ]]; then
+            cp -R apps/viewer/dist/* deploy-root/
+          elif [[ "${{ inputs.app }}" == "admin" ]]; then
+            mkdir -p deploy-root/admin
+            cp -R apps/admin/dist/* deploy-root/admin/
+          else
+            echo "Unknown app input: ${{ inputs.app }}"
+            exit 1
+          fi
+
+          if [[ "${{ inputs.include_api }}" == "true" ]]; then
+            mkdir -p deploy-root/api
+            rsync -a --delete \
+              --exclude='config.local.php' \
+              --exclude='.env' \
+              --exclude='.env.*' \
+              --exclude='vendor' \
+              services/api/ deploy-root/api/
+          fi
+
+      - name: Install API vendor (optional)
+        if: ${{ inputs.include_api && inputs.include_api_vendor }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+          coverage: none
+
+      - name: Composer install (API)
+        if: ${{ inputs.include_api && inputs.include_api_vendor }}
+        working-directory: services/api
+        run: composer install --no-interaction --prefer-dist --no-dev
+
+      - name: Copy API vendor into deploy folder
+        if: ${{ inputs.include_api && inputs.include_api_vendor }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p deploy-root/api/vendor
+          cp -R services/api/vendor/* deploy-root/api/vendor/
+
+      - name: Publish deploy-root to branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: ${{ inputs.deploy_branch }}
+          folder: deploy-root
+          clean: true

@@ -1,0 +1,57 @@
+name: Build dist (artifact)
+
+on:
+  workflow_dispatch:
+    inputs:
+      brand:
+        description: "Brand to build"
+        type: choice
+        required: true
+        default: wohlopti
+        options:
+          - wohlopti
+          - feelvonroll
+      app:
+        description: "App to build (viewer | admin | all)"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - viewer
+          - admin
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build dist (${{ inputs.brand }} / ${{ inputs.app }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        env:
+          BRAND: ${{ inputs.brand }}
+          APP: ${{ inputs.app }}
+        run: pnpm run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ inputs.brand }}-${{ inputs.app }}
+          if-no-files-found: error
+          path: |
+            dist/**
+            apps/*/dist/**
