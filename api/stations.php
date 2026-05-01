@@ -1,0 +1,37 @@
+<?php
+/**
+ * Public stations endpoint: get station info by key.
+ */
+
+header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Access-Control-Allow-Origin: *');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+    exit;
+}
+
+require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/services/stations_service.php';
+
+try {
+    $stationKey = isset($_GET['key']) ? trim($_GET['key']) : '';
+    if (!$stationKey) {
+        json_error('Missing station key', 400);
+    }
+
+    $pdo = require __DIR__ . '/db.php';
+
+    json_response(public_station_get($pdo, $stationKey));
+} catch (Throwable $error) {
+    handle_api_exception($error);
+}

@@ -1,0 +1,1 @@
+function s(){const e=document.createElement("div");e.className="layout";const t=document.createElement("div");t.className="status";const a=document.createElement("div");return a.className="pages",{layout:e,status:t,pages:a}}export{s as createLayout};

@@ -1,0 +1,12 @@
+# SPA fallback for the admin app deployed under /admin/
+# (single-origin routing: viewer at /, admin at /admin/, api at /api/).
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /admin/
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  RewriteRule ^ index.html [L]
+</IfModule>
