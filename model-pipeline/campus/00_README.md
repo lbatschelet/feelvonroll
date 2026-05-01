@@ -80,6 +80,7 @@ Use:
 Requirements:
 
 - Node.js installed
+- From the repository root run `npm install` once (`optimize_glb.mjs` resolves `@gltf-transform/*` and `meshoptimizer` from root `node_modules`). There is no `package.json` under `campus/tools/` so hosts do not treat that folder as the app root.
 - `npx obj2gltf` (via `npx`; version is pinned in the script)
 
 The script:
