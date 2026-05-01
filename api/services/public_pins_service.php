@@ -4,6 +4,8 @@
  * Exports: public_pins_list, public_pins_create, normalize_percent.
  */
 
+require_once __DIR__ . '/stations_service.php';
+
 /**
  * Returns public pins, optionally filtered by floor.
  *
@@ -229,15 +231,42 @@ function public_pins_resolve_questionnaire_key(PDO $pdo, ?string $stationKey): s
     if (!$stationKey) {
         return 'default';
     }
-    $stmt = $pdo->prepare(
-        'SELECT q.questionnaire_key
-         FROM stations s
-         LEFT JOIN questionnaires q ON q.id = s.questionnaire_id
-         WHERE s.station_key = :k
-         LIMIT 1'
-    );
-    $stmt->execute(['k' => $stationKey]);
-    $key = $stmt->fetchColumn();
+    $rawKey = trim((string)$stationKey);
+    if ($rawKey === '') {
+        return 'default';
+    }
+
+    $normalizedInput = normalize_station_key($rawKey);
+
+    $lookup = function (string $k) use ($pdo): string|false {
+        $stmt = $pdo->prepare(
+            'SELECT q.questionnaire_key
+             FROM stations s
+             LEFT JOIN questionnaires q ON q.id = s.questionnaire_id
+             WHERE s.station_key = :k
+             LIMIT 1'
+        );
+        $stmt->execute(['k' => $k]);
+        return $stmt->fetchColumn();
+    };
+
+    // Try exact (legacy), then normalized slug, then normalized(stored_key) match.
+    $key = $lookup($rawKey);
+    if (($key === false || $key === null || trim((string)$key) === '') && $normalizedInput !== '') {
+        $key = $lookup($normalizedInput);
+    }
+    if (($key === false || $key === null || trim((string)$key) === '') && $normalizedInput !== '') {
+        $keysStmt = $pdo->query('SELECT station_key FROM stations');
+        $keys = $keysStmt ? $keysStmt->fetchAll(PDO::FETCH_COLUMN) : [];
+        foreach ($keys as $storedKey) {
+            if (!is_string($storedKey) || $storedKey === '') continue;
+            if (normalize_station_key($storedKey) === $normalizedInput) {
+                $key = $lookup($storedKey);
+                if ($key !== false && $key !== null && trim((string)$key) !== '') break;
+            }
+        }
+    }
+
     if (!$key || !is_string($key) || trim($key) === '') {
         return 'default';
     }

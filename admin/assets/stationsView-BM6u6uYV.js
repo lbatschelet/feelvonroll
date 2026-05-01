@@ -30,13 +30,16 @@ import{i as e}from"./dom-DU-lIz3W.js";function n(){const t=document.createElemen
         <div class="modal-fields-row">
           <label class="field">
             <span>Key</span>
-            <input type="text" id="stKeyInput" placeholder="e.g. foyer_eg" />
+            <input type="text" id="stKeyInput" placeholder="e.g. foyer-eg" />
           </label>
           <label class="field">
             <span>Name</span>
             <input type="text" id="stNameInput" placeholder="e.g. Foyer Erdgeschoss" />
           </label>
         </div>
+        <p class="form-hint" style="margin-top:0">
+          Key is the stable, URL-safe slug embedded in QR codes and paths (lowercase, numbers, hyphens). Keep it short and unique. Use Name for the human-readable label.
+        </p>
         <label class="field" style="margin-bottom:12px">
           <span>Description</span>
           <textarea id="stDescInput" rows="2" placeholder="Optional description"></textarea>
